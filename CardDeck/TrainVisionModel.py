@@ -26,7 +26,7 @@ add_background = Compose([
     ToDtype(torch.float32, scale=True),
 ])
 
-cards_with_background = ImageFolder('data/bicycle_cards', transform=add_background)
+cards_with_background = ImageFolder('data/playing_cards', transform=add_background)
 n_classes = len(cards_with_background.classes)
 n_repeat = 100
 large_dataset = torch.utils.data.ConcatDataset([cards_with_background] * n_repeat)
