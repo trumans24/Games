@@ -4,3 +4,6 @@ torchvision
 tensorboard
 lightning
 matplotlib
+ultralytics
+plotly
+nbformat
