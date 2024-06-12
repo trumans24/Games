@@ -1,4 +1,4 @@
-# Games
+# ML and AI for Games
 
 This repository is a collection of Python code and Jupyter Notebooks showcasing various projects related to card games and artificial intelligence. It explores techniques for:
 
