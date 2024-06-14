@@ -13,6 +13,7 @@ from torchvision.transforms.v2 import Resize, Compose, RandomResize, ColorJitter
 # Initialize parser
 parser = argparse.ArgumentParser(prog='test', description='Testing functionality of argparse', epilog='I am exploring argparse and I need to understand what is happening')
 parser.add_argument('source', help="Specify the root of the directory with images of cards and which must follow pytorch's convention for ImageFolder.")
+parser.add_argument('-b', '--background', default='../data/sample_images', help="Specify the root of the directory random background images can be found.")
 parser.add_argument('-d', '--destination', default='dataset/object_detection/', help="Specify the root of the directory where the dataset should be saved.")
 parser.add_argument('--train', type=int, default=100, help="Specify how many sample to make for the training dataset")
 parser.add_argument('--val', type=int, default=10, help="Specify how many sample to make for the validation dataset")
@@ -32,7 +33,7 @@ cards = ImageFolder(args.source, transform=card_transform)
 dst = Path(args.destination)
 
 resize = Resize(112)
-combine_cards = AddBackground(448, 448)
+combine_cards = AddBackground(args.background)
 
 for group in [g for g in ['train', 'val', 'test'] if vars(args)[g] > 0]:
     images_dir = dst / 'images' / group

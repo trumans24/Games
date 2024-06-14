@@ -1,7 +1,11 @@
+from PIL import Image
 from torch import randint as randi, uint8, zeros_like
 from random import choice, randint
+from pathlib import Path
 from torch.nn import Module
 from torchvision.transforms.functional import to_pil_image, pil_to_tensor
+from torchvision.transforms.v2 import RandomResizedCrop
+
 
 def fake_image(height, width, channel=3, PIL=True):
     if PIL:
@@ -31,14 +35,15 @@ class CombineCards(Module):
         return background, '\n'.join(labels)
 
 class AddBackground(Module):
-    def __init__(self, width=448, height=448, PIL=True) -> None:
+    def __init__(self, source, size=640, PIL=True) -> None:
         super().__init__()
-        self.width = width
-        self.height = height
+        self.width = size
+        self.height = size
         self.PIL = PIL
+        self.background = RandomBackground(source)
 
     def forward(self, samples):
-        background = fake_image(self.height, self.width, PIL=False)
+        background = pil_to_tensor(self.background())
         labels = []
         for img, label in samples:
             height, width = img.height, img.width
@@ -55,3 +60,15 @@ class AddBackground(Module):
         if self.PIL:
             return to_pil_image(background), '\n'.join(labels)
         return background, '\n'.join(labels)
+
+class RandomBackground(Module):
+    def __init__(self, source, size=640, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.files = list(Path(source).glob('*.jpg'))
+        self.crop = RandomResizedCrop(size)
+    
+    def forward(self):
+        path = choice(self.files)
+        with open(path, "rb") as f:
+            img = Image.open(f)
+            return self.crop(img.convert("RGB"))
