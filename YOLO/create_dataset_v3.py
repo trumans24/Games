@@ -1,5 +1,5 @@
 """
-python create_dataset_v3.py /home/trumanss/CodeProject/Games/data/playing_cards -d dataset/object_detection_v3/ --train 10000 --val 3000
+python create_dataset_v3.py /home/trumanss/CodeProject/Games/data/skullking -d dataset/skullking/ --train 100000 --val 30000
 """
 import argparse
 from tqdm import trange
@@ -25,11 +25,11 @@ args = parser.parse_args()
 card_transform = Compose([
     RandomResize(50, 112),
     ColorJitter(brightness=(0.5, 1.0), contrast=(0.5, 1.0)),
-    RandomRotation(30, expand=True),
+    RandomRotation(180, expand=True),
     RandomPerspective(0.3),
 ])
 
-card_classes = ImageFolder(r'../data/playing_cards').classes
+card_classes = ImageFolder(args.source).classes
 cards = read_root(Path(args.source), size=224, labels=card_classes)
 random_background = read_root(Path(args.background), size=640)
 dst = Path(args.destination)
