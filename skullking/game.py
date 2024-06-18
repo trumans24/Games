@@ -43,11 +43,11 @@ class Game:
                     scores[name] += 20 * bets[name][0] if bets[name][0] else 10 * self.round
                 else:
                     scores[name] -= 10 * abs(bets[name][0] - bets[name][1]) if bets[name][0] else 10 * self.round
-            self.round += 1
             if self.human_Playing:
                 print('_'*100)
                 print(f'The Scores after round {self.round}:')
                 print(scores)
+            self.round += 1
         return scores
 
     def play_round(self):
