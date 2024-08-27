@@ -41,6 +41,10 @@ class Player:
 
 class Human(Player):
     def play(self, current_trick: list, trump_color:str, number_of_players:int = 0) -> str:
+        if len(self.cards) == 1:
+            card = self.cards[0]
+            self.cards.remove(card)
+            return Card(card)
         print('_'*100)
         print('Cards that have already been played in this trick:', current_trick if len(current_trick) > 0 else None)
         print('What card would you like to play? Cards in hand:', self.cards)

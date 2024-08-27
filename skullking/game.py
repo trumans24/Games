@@ -149,3 +149,54 @@ class Game:
         trump_color = 'black' if 'black' in ''.join(cards) else Game.get_trump_color(cards)
         card_numbers = [card.number if card.color == trump_color else 0 for card in cards]
         return cards[array(card_numbers).argmax()]
+
+
+
+import requests
+
+class OnlineGame(Game):
+    def __init__(self, deck: list, playerDict: dict, host='http://127.0.0.1:8000', game_id=0, human=False) -> None:
+        super().__init__(deck, playerDict, human)
+        self.host = host
+        self.game_id = game_id
+        # self.new_deck(deck)
+
+    def reset(self):
+        self.trump = ''
+        self.round = 1
+        self.trick = 1
+        self.new_deck(self.cards)
+        for player in self.playerDict.values():
+            player.cards = []
+            player.current_bet = 0
+            player.tricks_won = 0
+
+    def deal(self, n=0):
+        self.new_deck(self.cards)
+        for _ in range(n) if n else range(self.round):
+            for _, player in self.playerDict.items():
+                card = self.draw()['card']
+                if card is not None:
+                    player.add_card(Card(card))
+
+    # def play_round(self):
+    #     return super().play_round()
+
+    def new_deck(self, deck):
+        headers = {
+            'accept': 'application/json',
+            'Content-Type': 'application/json',
+        }
+        json_data = {
+            'deck': deck,
+        }
+
+        return requests.post(f'{self.host}/{self.game_id}/new-deck', headers=headers, json=json_data)
+
+    def draw(self):
+        headers = {
+            'accept': 'application/json',
+            'content-type': 'application/x-www-form-urlencoded',
+        }
+        r = requests.get(f'{self.host}/{self.game_id}/deal', headers=headers)
+        return r.json()
