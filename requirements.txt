@@ -7,4 +7,5 @@ matplotlib
 ultralytics
 plotly
 nbformat
+multiset
 "fastapi[standard]"
