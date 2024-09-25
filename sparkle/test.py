@@ -1,7 +1,6 @@
 import os
-import time
-from util import play_game, roll_dice, highest_score, play_round
-# os.system('cls' if os.name == 'nt' else "printf '\033c'")
+from util import roll_dice, play_round
+
 game_state = dict(
     player_score=0,
     computer_score=0,
@@ -67,7 +66,3 @@ while game_state['response']:
         else:
             print('Congradulations You and the Computer tied!')
         break
-
-
-
-# print(game_state.format(player_score=100, score = 100))
