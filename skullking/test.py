@@ -1,4 +1,4 @@
-from game import OnlineGame
+from game import Game
 from player import CPU, Human
 from cards import deck
 
@@ -11,7 +11,7 @@ players = {
     'Alex3': CPU('Alex3'),
     'Sam': Human('Sam')
 }
-
-game = OnlineGame(deck, players, human=True)
+game = Game(deck, players, human=True)
+game.new_game()
 
 print(game.new_game())

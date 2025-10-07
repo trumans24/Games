@@ -2,31 +2,95 @@ from game import Game
 from cards import special, winning_special, Card
 from random import choice, random
 class Player:
-    def __init__(self, name, cards=None) -> None:
-        self.name = name
-        self.cards = cards if cards is not None else []
-        self.current_bet = 0
-        self.tricks_won = 0
+    def __init__(self, name: str, cards: list[Card] = None) -> None:
+        """
+        Initialize a new player.
+        
+        Args:
+            name (str): Player's name
+            cards (list[Card], optional): Initial hand of cards. Defaults to empty list.
+        
+        Attributes:
+            name (str): Player's name
+            cards (list[Card]): Player's current hand
+            current_bet (int): Player's bet for current round
+            tricks_won (int): Number of tricks won in current round
+        """
+        self.name: str = name
+        self.cards: list[Card] = cards if cards is not None else []
+        self.current_bet: int = 0
+        self.tricks_won: int = 0
 
-    def __repr__(self):
+    def __repr__(self) -> str:
+        """
+        Return string representation of the player.
+        
+        Returns:
+            str: Player name and their current cards
+        """
         return f'{self.name}: {self.cards}'
 
-    def add_card(self, card: str) -> None:
+    def add_card(self, card: Card) -> None:
+        """
+        Add a card to the player's hand.
+        
+        Args:
+            card (Card): Card to add to the hand
+        """
         if self.cards is not None:
             self.cards.append(card)
         else:
             self.cards = [card]
 
-    def set_cards(self, cards: list) -> None:
+    def set_cards(self, cards: list[Card]) -> None:
+        """
+        Set the player's hand to a new set of cards.
+        
+        Args:
+            cards (list[Card]): New hand of cards
+        """
         self.cards = cards
 
-    def play(self, current_trick:list, trump_color:str, number_of_players:int = 0) -> str:
+    def play(self, current_trick: list[Card], trump_color: str, number_of_players: int = 0) -> Card:
+        """
+        Play a card from the hand (abstract method).
+        
+        Args:
+            current_trick (list[Card]): Cards already played in this trick
+            trump_color (str): Current trump color
+            number_of_players (int, optional): Number of players in game. Defaults to 0.
+        
+        Returns:
+            Card: The card to play
+        """
         pass
 
-    def bet(self, number_of_players:int):
+    def bet(self, number_of_players: int) -> int:
+        """
+        Make a bet for the current round (abstract method).
+        
+        Args:
+            number_of_players (int): Number of players in the game
+        
+        Returns:
+            int: Number of tricks the player bets to win
+        """
         pass
 
-    def valid_cards(self, cards):
+    def valid_cards(self, cards: list[Card]) -> list[Card]:
+        """
+        Determine which cards can be legally played.
+        
+        Args:
+            cards (list[Card]): Cards already played in the trick
+        
+        Returns:
+            list[Card]: List of valid cards that can be played
+        
+        Rules:
+        - If player has trump cards, must play trump or special cards
+        - Otherwise, can play any card in hand
+        """
         valid_card_list = []
         trump_color = Game.get_trump_color(cards)
         have_trump = False
@@ -40,7 +104,25 @@ class Player:
         return self.cards
 
 class Human(Player):
-    def play(self, current_trick: list, trump_color:str, number_of_players:int = 0) -> str:
+    def play(self, current_trick: list[Card], trump_color: str, number_of_players: int = 0) -> Card:
+        """
+        Human player card selection with interactive input.
+        
+        Args:
+            current_trick (list[Card]): Cards already played in this trick
+            trump_color (str): Current trump color
+            number_of_players (int, optional): Number of players in game. Defaults to 0.
+        
+        Returns:
+            Card: The card selected by the human player
+        
+        Interactive flow:
+        1. If only one card, play it automatically
+        2. Display current trick and hand
+        3. Get player input for card selection
+        4. Validate card is legal to play
+        5. Handle special Tigress card choice
+        """
         if len(self.cards) == 1:
             card = self.cards[0]
             self.cards.remove(card)
@@ -70,7 +152,21 @@ class Human(Player):
                 print('You must follow suit or play a special card.')
 
 
-    def bet(self, number_of_players:int):
+    def bet(self, number_of_players: int) -> int:
+        """
+        Human player bet selection with interactive input.
+        
+        Args:
+            number_of_players (int): Number of players in the game
+        
+        Returns:
+            int: Number of tricks the player bets to win
+        
+        Interactive flow:
+        1. Display current hand
+        2. Get player input for bet amount
+        3. Validate bet is within allowed range
+        """
         print('_'*100)
         print('Please make your bet. Cards in hand:', self.cards)
         while True:
@@ -83,7 +179,23 @@ class Human(Player):
                 print('Not a valid bet.')
 
 class CPU(Player):
-    def play(self, current_trick:list, trump_color:str, number_of_players:int = 0) -> str:
+    def play(self, current_trick: list[Card], trump_color: str, number_of_players: int = 0) -> Card:
+        """
+        CPU player card selection with random strategy.
+        
+        Args:
+            current_trick (list[Card]): Cards already played in this trick
+            trump_color (str): Current trump color
+            number_of_players (int, optional): Number of players in game. Defaults to 0.
+        
+        Returns:
+            Card: The card selected by the CPU player
+        
+        Strategy:
+        1. If only one card, play it
+        2. Randomly select from valid cards
+        3. Handle Tigress card with random choice
+        """
         if len(self.cards) == 1:
             return self.cards.pop()
         valid_card_list = self.valid_cards(current_trick)
@@ -93,7 +205,24 @@ class CPU(Player):
             card = Card('pirate-' if random() >= 0.5 else 'pass-')
         return card
 
-    def try2win(self, current_trick:list[Card], trump_color:str):
+    def try2win(self, current_trick: list[Card], trump_color: str) -> Card:
+        """
+        Try to win the trick with strategic card selection.
+        
+        Args:
+            current_trick (list[Card]): Cards already played in this trick
+            trump_color (str): Current trump color
+        
+        Returns:
+            Card: Card that will win the trick if possible
+        
+        Strategy:
+        1. Try winning special cards first
+        2. Try black cards if they can win
+        3. Try trump color cards
+        4. Try any card that can win
+        5. Fall back to first card if none can win
+        """
         winners = set(self.cards) & set(winning_special)
         for card in winners:
             if card == Game.winning_card(current_trick):
@@ -117,7 +246,25 @@ class CPU(Player):
                 return card
         return self.cards[0]
 
-    def try2lose(self, current_trick:list, trump_color:str):
+    def try2lose(self, current_trick: list[Card], trump_color: str) -> Card:
+        """
+        Try to lose the trick with strategic card selection.
+        
+        Args:
+            current_trick (list[Card]): Cards already played in this trick
+            trump_color (str): Current trump color
+        
+        Returns:
+            Card: Card that will likely lose the trick
+        
+        Strategy:
+        1. If no cards played, play lowest non-winning card
+        2. Handle White Whale special case
+        3. Handle Kraken special case
+        4. Try trump color cards
+        5. Try cards that won't win
+        6. Fall back to any card
+        """
         if len(current_trick) == 0:
             non_winning = set(self.cards) - set(winning_special)
             if len(non_winning) > 0:
@@ -178,7 +325,23 @@ class CPU(Player):
                 return card
         return card
 
-    def card_in_color(self, color, best=True, max_value=14, min_value=1):
+    def card_in_color(self, color: str, best: bool = True, max_value: int = 14, min_value: int = 1) -> Card:
+        """
+        Find the best card of a specific color in hand.
+        
+        Args:
+            color (str): Color to search for
+            best (bool, optional): Whether to find best (highest) card. Defaults to True.
+            max_value (int, optional): Maximum card value to consider. Defaults to 14.
+            min_value (int, optional): Minimum card value to consider. Defaults to 1.
+        
+        Returns:
+            Card: Best card of the specified color, or empty string if none found
+        
+        Logic:
+        - If best=True: finds highest card under max_value
+        - If best=False: finds lowest card above min_value
+        """
         candidate = ''
         for card in sorted(self.cards, key=lambda x: x.number, reverse=not best):
             if card.color == color:
@@ -188,7 +351,21 @@ class CPU(Player):
                     candidate = card
         return candidate
 
-    def bet(self, number_of_players:int):
+    def bet(self, number_of_players: int) -> int:
+        """
+        CPU player bet calculation based on hand strength.
+        
+        Args:
+            number_of_players (int): Number of players in the game
+        
+        Returns:
+            int: Number of tricks the CPU bets to win
+        
+        Strategy:
+        - Count special cards (skullking, pirate, mermaid)
+        - Count half of black cards
+        - Sum these for the bet
+        """
         card_colors = [card.split('-')[0] for card in self.cards]
         bet = card_colors.count('skullking') + card_colors.count('pirate') + card_colors.count('mermaid') + card_colors.count('black') // 2
         self.current_bet = bet
