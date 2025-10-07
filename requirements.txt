@@ -1,5 +1,6 @@
 numpy
 torch
+pandas
 torchvision
 tensorboard
 lightning
@@ -8,4 +9,4 @@ ultralytics
 plotly
 nbformat
 multiset
-"fastapi[standard]"
+fastapi[standard]
