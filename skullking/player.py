@@ -5,22 +5,53 @@ from typing import List, Dict, Self, Iterable
 from util import print_game
 
 class Player:
-    def __init__(self, name, cards=None) -> None:
-        self.name = name
-        self.cards: List[Card] = cards if cards is not None else []
-        self.current_bet = 0
-        self.tricks_won = 0
+    def __init__(self, name: str, cards: list[Card] = None) -> None:
+        """
+        Initialize a new player.
+        
+        Args:
+            name (str): Player's name
+            cards (list[Card], optional): Initial hand of cards. Defaults to empty list.
+        
+        Attributes:
+            name (str): Player's name
+            cards (list[Card]): Player's current hand
+            current_bet (int): Player's bet for current round
+            tricks_won (int): Number of tricks won in current round
+        """
+        self.name: str = name
+        self.cards: list[Card] = cards if cards is not None else []
+        self.current_bet: int = 0
+        self.tricks_won: int = 0
 
-    def __repr__(self):
+    def __repr__(self) -> str:
+        """
+        Return string representation of the player.
+        
+        Returns:
+            str: Player name and their current cards
+        """
         return f'{self.name}: {self.cards}'
 
     def add_card(self, card: Card) -> None:
+        """
+        Add a card to the player's hand.
+        
+        Args:
+            card (Card): Card to add to the hand
+        """
         if self.cards is not None:
             self.cards.append(card)
         else:
             self.cards = [card]
 
-    def set_cards(self, cards: List[Card]) -> None:
+    def set_cards(self, cards: list[Card]) -> None:
+        """
+        Set the player's hand to a new set of cards.
+        
+        Args:
+            cards (list[Card]): New hand of cards
+        """
         self.cards = cards
 
     def play(self, current_trick: Dict[Self, Card], trump_color: str, number_of_players: int = 0) -> str: # type: ignore
@@ -74,7 +105,21 @@ class Human(Player):
                 print('You must follow suit or play a special card.')
 
 
-    def bet(self, number_of_players:int):
+    def bet(self, number_of_players: int) -> int:
+        """
+        Human player bet selection with interactive input.
+        
+        Args:
+            number_of_players (int): Number of players in the game
+        
+        Returns:
+            int: Number of tricks the player bets to win
+        
+        Interactive flow:
+        1. Display current hand
+        2. Get player input for bet amount
+        3. Validate bet is within allowed range
+        """
         print('_'*100)
         print('Please make your bet. Cards in hand:', self.cards)
         while True:
@@ -184,7 +229,23 @@ class CPU(Player):
                 return card
         return card
 
-    def card_in_color(self, color, best=True, max_value=14, min_value=1):
+    def card_in_color(self, color: str, best: bool = True, max_value: int = 14, min_value: int = 1) -> Card:
+        """
+        Find the best card of a specific color in hand.
+        
+        Args:
+            color (str): Color to search for
+            best (bool, optional): Whether to find best (highest) card. Defaults to True.
+            max_value (int, optional): Maximum card value to consider. Defaults to 14.
+            min_value (int, optional): Minimum card value to consider. Defaults to 1.
+        
+        Returns:
+            Card: Best card of the specified color, or empty string if none found
+        
+        Logic:
+        - If best=True: finds highest card under max_value
+        - If best=False: finds lowest card above min_value
+        """
         candidate = ''
         for card in sorted(self.cards, key=lambda x: x.number, reverse=not best):
             if card.color == color:

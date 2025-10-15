@@ -1,4 +1,4 @@
-from game import OnlineGame, Game
+from game import Game
 from player import CPU, Human
 from cards import deck
 

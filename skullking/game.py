@@ -37,7 +37,13 @@ Player {title}:
 ===================================='''
         print(formated_game.format(round=self.round, title=title, players=stat_string, message=message))
 
-    def reset(self):
+    def reset(self) -> None:
+        """
+        Reset the game to its initial state.
+        
+        Resets trump color, round/trick counters, deck, and all player states.
+        Clears all player cards, bets, and tricks won.
+        """
         self.trump = ''
         self.round = 1
         self.trick = 1
@@ -47,14 +53,35 @@ Player {title}:
             player.current_bet = 0
             player.tricks_won = 0
 
-    def deal(self, n=0):
+    def deal(self, n: int = 0) -> None:
+        """
+        Deal cards to all players.
+        
+        Args:
+            n (int, optional): Number of cards to deal per player. 
+                              If 0, deals cards equal to current round number.
+        
+        Creates a shuffled copy of the deck and deals cards to each player.
+        """
         deck = self.cards.copy()
         shuffle(deck)
         for _ in range(n) if n else range(self.round):
             for _, player in self.playerDict.items():
                 player.add_card(deck.pop())
 
-    def new_game(self):
+    def new_game(self) -> dict:
+        """
+        Play a complete Skull King game (10 rounds).
+        
+        Returns:
+            dict: Final scores for all players
+            
+        Game flow:
+        1. Reset game state
+        2. Play 10 rounds (1-10 cards per round)
+        3. Calculate scores based on bet accuracy
+        4. Return final scores
+        """
         self.reset()
         scores = {name: 0 for name, player in self.playerDict.items()}
         while self.round <= 10:
@@ -73,7 +100,20 @@ Player {title}:
             self.round += 1
         return scores
 
-    def play_round(self):
+    def play_round(self) -> dict:
+        """
+        Play a complete round of Skull King.
+        
+        Returns:
+            dict: Dictionary with bet results for each player
+                 Format: {player_name: [bet_made, tricks_won]}
+        
+        Round flow:
+        1. Collect bets from all players
+        2. Play tricks equal to round number
+        3. Track tricks won by each player
+        4. Reorder players for next round
+        """
         bets = {name: [player.bet(len(self.playerDict)), 0] for name, player in self.playerDict.items()}
         if self.human_playing:
             
@@ -94,7 +134,20 @@ Player {title}:
         self.reorder_players(next_player_name)
         return bets
 
-    def play_trick(self):
+    def play_trick(self) -> str:
+        """
+        Play a single trick in the current round.
+        
+        Returns:
+            str: Name of the winning player, or empty string if Kraken was played
+        
+        Trick flow:
+        1. Each player plays a card in turn
+        2. First card determines trump color
+        3. Special handling for Kraken card
+        4. Determine winner based on card hierarchy
+        5. Reorder players for next trick
+        """
         cards = []
         cards_dict = {}
         for player_name, player in self.playerDict.items():
@@ -121,7 +174,16 @@ Player {title}:
                 self.print_game('Cards', cards_dict, f'The winner of the round is {winner} by playing a {self.winning_card(cards)}')
             return winner
 
-    def reorder_players(self, starting_player_name):
+    def reorder_players(self, starting_player_name: str) -> None:
+        """
+        Reorder the player dictionary so the specified player goes first.
+        
+        Args:
+            starting_player_name (str): Name of the player who should start next
+        
+        Reorders the playerDict so that the specified player becomes the first
+        in the turn order for subsequent tricks/rounds.
+        """
         playerList = list(self.playerDict.values())
         starting_index = playerList.index(self.playerDict[starting_player_name])
         self.playerDict = {player.name: player for player in playerList[starting_index:] + playerList[:starting_index]}
@@ -184,12 +246,32 @@ import requests
 
 class OnlineGame(Game):
     def __init__(self, deck: list, playerDict: dict, host='http://127.0.0.1:8000', game_id=0, human=False) -> None:
+        """
+        Initialize an online Skull King game with remote deck management.
+        
+        Args:
+            deck (list): List of cards in the game deck
+            playerDict (dict): Dictionary mapping player names to Player objects
+            host (str, optional): API host URL. Defaults to 'http://127.0.0.1:8000'.
+            game_id (int, optional): Unique game identifier. Defaults to 0.
+            human (bool, optional): Whether a human is playing. Defaults to False.
+        
+        Attributes:
+            host (str): API server host URL
+            game_id (int): Unique identifier for this game session
+        """
         super().__init__(deck, playerDict, human)
         self.host = host
         self.game_id = game_id
         # self.new_deck(deck)
 
     def reset(self):
+        """
+        Reset the online game to its initial state.
+        
+        Resets trump color, round/trick counters, creates new deck via API,
+        and clears all player states.
+        """
         self.trump = ''
         self.round = 1
         self.trick = 1
@@ -199,7 +281,16 @@ class OnlineGame(Game):
             player.current_bet = 0
             player.tricks_won = 0
 
-    def deal(self, n=0):
+    def deal(self, n: int = 0) -> None:
+        """
+        Deal cards to all players using remote API.
+        
+        Args:
+            n (int, optional): Number of cards to deal per player.
+                              If 0, deals cards equal to current round number.
+        
+        Creates a new deck via API and draws cards for each player.
+        """
         self.new_deck(self.cards)
         for _ in range(n) if n else range(self.round):
             for _, player in self.playerDict.items():
@@ -210,7 +301,18 @@ class OnlineGame(Game):
     # def play_round(self):
     #     return super().play_round()
 
-    def new_deck(self, deck):
+    def new_deck(self, deck: list) -> requests.Response:
+        """
+        Create a new deck on the remote server.
+        
+        Args:
+            deck (list): List of cards to initialize the deck with
+        
+        Returns:
+            requests.Response: API response from the server
+        
+        Sends a POST request to create a new deck on the remote server.
+        """
         headers = {
             'accept': 'application/json',
             'Content-Type': 'application/json',
@@ -221,7 +323,16 @@ class OnlineGame(Game):
 
         return requests.post(f'{self.host}/{self.game_id}/new-deck', headers=headers, json=json_data)
 
-    def draw(self):
+    def draw(self) -> dict:
+        """
+        Draw a card from the remote deck.
+        
+        Returns:
+            dict: JSON response containing the drawn card
+            
+        Makes a GET request to the remote server to draw a single card
+        from the current deck.
+        """
         headers = {
             'accept': 'application/json',
             'content-type': 'application/x-www-form-urlencoded',
