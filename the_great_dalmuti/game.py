@@ -1,8 +1,7 @@
-from ast import Tuple
 from random import shuffle
-from player import Player
-from game_state import GameState
-from typing import List, Dict, Self, Tuple
+from the_great_dalmuti.player import Player, CPU, Human
+from the_great_dalmuti.game_state import GameState
+from typing import List, Dict, Self, Tuple, Sequence
 
 
 def get_cards(shuffle_cards=True):
@@ -16,13 +15,19 @@ def get_cards(shuffle_cards=True):
 
 
 class Game:
-  def __init__(self, players: List[Player]) -> None:
+  def __init__(self, players: List[CPU]) -> None:
+    # shuffle(players)
     self.players = players
     self.cards = get_cards()
-    self.game_state = GameState()
+    self.game_state = GameState([p for p in players])
     self.num_players = len(players)
 
   def play(self):
+    # Deal cards
+    for i, card in enumerate(self.cards):
+      self.players[i % self.num_players].add_cards(card)
+    print(self.game_state)
+    
     # first player trades two cards with last players
     greater_dalmutis_cards = self.players[0].give_any_cards(2)
     greater_peons_cards = self.players[-1].give_low_cards(2)
@@ -36,20 +41,61 @@ class Game:
       self.players[1].add_cards(lesser_peons_cards)
       self.players[-2].add_cards(lesser_dalmutis_cards)
 
-    last_player_to_play = self.players[0]
+    last_player_to_play = None
+    game_over = False
     finished_players = []
     
     while self.players:
       player = self.players.pop(0)
-      if player == last_player_to_play:
-        self.game_state.clear_current_round()
-      self.game_state.add_to_current_round(player.name, player.play(self.game_state))
-      print(self.game_state)
       
-      if player.has_cards():
-        self.players.append(player)
-      else:
+      while not player.has_cards():
         finished_players.append(player)
+        if not self.players:
+          game_over = True
+          break
+        if not last_player_to_play:
+          last_player_to_play = player
+        elif player == last_player_to_play:
+          print(f"{player.name} has won the trick but has no cards.")
+          self.game_state.clear_current_round()
+          if not self.players:
+            break
+          player = self.players.pop(0)
+          print(f'{player.name}\'s turn to play.')
+          last_player_to_play = player
+        else:
+          print(f"{player.name} has no cards, skipping turn.")
+          if not self.players:
+            break
+          player = self.players.pop(0)
+      if game_over:
+        break
+      
+      if player == last_player_to_play:
+        print(f"{player.name} has won the trick.")
+        print(self.game_state)
+        self.game_state.clear_current_round()
+      cards_played = player.play(self.game_state)
+      if cards_played:
+        last_player_to_play = player
+      self.game_state.add_to_current_round(player.name, cards_played)
+      print(f'{player.name} played: {cards_played}')
+      
+      if not player.has_cards():
+        print(f"{player.name} has finished all their cards!")
+      
+      self.players.append(player)
+
+      response = input()
+      if response in ['q', 'quit', 'exit']:
+        exit(0)
+      elif response in ['s', 'show']:
+        for p in self.players:
+          print(f"{p.name}: {p._cards}")
     
+    print("Round Over! Rankings:")
+    for i, player in enumerate(finished_players, 1):
+        print(f"{i}. {player.name}")
     self.players = finished_players
+    self.game_state = GameState(self.players.copy())
 

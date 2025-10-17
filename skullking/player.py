@@ -1,11 +1,11 @@
-from game import Game
-from cards import special, winning_special, Card
+from skullking.game import Game
+from skullking.cards import special, winning_special, Card
 from random import choice, random
 from typing import List, Dict, Self, Iterable
-from util import print_game
+from skullking.util import print_game
 
 class Player:
-    def __init__(self, name: str, cards: list[Card] = None) -> None:
+    def __init__(self, name: str, cards: list[Card] | None = None) -> None:
         """
         Initialize a new player.
         
@@ -20,7 +20,7 @@ class Player:
             tricks_won (int): Number of tricks won in current round
         """
         self.name: str = name
-        self.cards: list[Card] = cards if cards is not None else []
+        self.cards: list[Card] = cards or []
         self.current_bet: int = 0
         self.tricks_won: int = 0
 
@@ -253,7 +253,7 @@ class CPU(Player):
                     candidate = card
                 elif (candidate.number < card.number < max_value) if best else (min_value < card.number < candidate.number):
                     candidate = card
-        return candidate
+        return Card(candidate)
 
     def bet(self, number_of_players:int):
         card_colors = [card.color for card in self.cards]

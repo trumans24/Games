@@ -1,6 +1,6 @@
 from  pandas import DataFrame, Categorical
 from random import shuffle
-from cards import deck, Card
+from skullking.cards import deck, Card
 from numpy import array, nan
 from typing import *
 
