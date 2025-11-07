@@ -1,0 +1,14 @@
+click
+numpy
+torch
+pandas
+torchvision
+tensorboard
+lightning
+matplotlib
+ultralytics
+plotly
+nbformat
+multiset
+fastapi[standard]
+click

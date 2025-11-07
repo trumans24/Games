@@ -1,0 +1,21 @@
+Metadata-Version: 2.4
+Name: games
+Version: 0.1.0
+Summary: Collections of Card Games
+Requires-Python: >=3.12
+License-File: LICENSE
+Requires-Dist: click
+Requires-Dist: numpy
+Requires-Dist: torch
+Requires-Dist: pandas
+Requires-Dist: torchvision
+Requires-Dist: tensorboard
+Requires-Dist: lightning
+Requires-Dist: matplotlib
+Requires-Dist: ultralytics
+Requires-Dist: plotly
+Requires-Dist: nbformat
+Requires-Dist: multiset
+Requires-Dist: fastapi[standard]
+Requires-Dist: click
+Dynamic: license-file

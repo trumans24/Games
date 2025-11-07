@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=80.9"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "games"
+version = "0.1.0"
+description = "Collections of Card Games"
+requires-python = ">=3.12"
+dependencies = [
+    "click",
+    "numpy",
+    "torch",
+    "pandas",
+    "torchvision",
+    "tensorboard",
+    "lightning",
+    "matplotlib",
+    "ultralytics",
+    "plotly",
+    "nbformat",
+    "multiset",
+    "fastapi[standard]",
+    "click",
+]
+
+[project.scripts]
+dalmuti = "the_great_dalmuti.play:main"
+

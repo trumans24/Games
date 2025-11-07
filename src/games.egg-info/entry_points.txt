@@ -1,0 +1,2 @@
+[console_scripts]
+dalmuti = the_great_dalmuti.play:main
