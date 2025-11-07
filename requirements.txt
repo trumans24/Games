@@ -10,3 +10,4 @@ plotly
 nbformat
 multiset
 fastapi[standard]
+click

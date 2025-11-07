@@ -1,4 +1,4 @@
-from the_great_dalmuti.player import Player, CPU, Human
+from the_great_dalmuti.player import Player, CPU, CPU2, Human
 from the_great_dalmuti.game_state import GameState
 
 class TestPlayer:
@@ -34,15 +34,19 @@ class TestPlayer:
         assert player.get_valid_cards([6, 6, 6]) == [2, 2, 5, 5, 5, 13]
 
     def test_play_human(self, monkeypatch):
-        inputs = iter(['', '4, 4'])
-        monkeypatch.setattr('builtins.input', lambda _: next(inputs))
+        prompts = iter(['', 4])
+        confirms = iter([True])
+        monkeypatch.setattr('click.prompt', lambda *args, **kwargs: next(prompts))
+        monkeypatch.setattr('click.confirm', lambda *args, **kwargs: next(confirms))
+
         player = Human("Test")
         player.add_cards([4, 4])
         game_state = GameState([CPU('Computer1'), player])
-        game_state.add_to_current_round('Computer1', [5, 5])
-        assert player.play(game_state) == [] # no last played, plays highest cards
+        game_state.add_to_current_round('Computer1', [3, 3])
+        assert player.play(game_state) == []
         game_state.clear_current_round()
-        assert player.play(game_state) == [4, 4] # plays valid cards
+        game_state.add_to_current_round('Computer1', [5, 5])
+        assert player.play(game_state) == [4, 4]
 
     def test_play_cpu(self):
         player = CPU("Test")
@@ -110,6 +114,85 @@ class TestPlayer:
         player2 = CPU("Test2")
         player3 = CPU("Test3")
         player4 = CPU("Test4")
+        player1.add_cards([3, 3, 4, 4, 7, 7, 7, 7, 9, 9, 13])
+        player2.add_cards([1, 2, 2, 4, 4, 5, 5, 5, 6, 6, 8, 8, 9, 10, 10, 10, 12, 12, 12, 12])
+        player3.add_cards([3, 6, 6, 6, 6, 7, 8, 8, 8, 9, 9, 9, 9, 10, 10, 11, 11, 12, 12, 13])
+        player4.add_cards([5, 5, 7, 7, 8, 8, 8, 9, 9, 10, 10, 10, 11, 11, 12, 12, 12, 12, 12, 12])
+        game_state = GameState([player1, player2, player3, player4])
+        game_state.add_to_current_round(player1.name, [10, 10])
+        cards2 = player2.play(game_state)
+        assert game_state.valid_play(cards2)
+        game_state.add_to_current_round(player2.name, cards2)
+        cards3 = player3.play(game_state)
+        assert game_state.valid_play(cards3)
+        game_state.add_to_current_round(player3.name, cards3)
+
+    def test_play_cpu2(self):
+        player = CPU2("Test")
+        player.add_cards([1, 2, 7, 7, 10, 10, 11, 11, 11, 12, 13, 13])
+        game_state = GameState([player])
+        
+        cards = player.play(game_state)
+        assert game_state.valid_play(cards)
+        game_state.add_to_current_round(player.name, cards)
+
+        game_state.clear_current_round()
+        game_state.add_to_current_round(player.name, [9])
+
+        cards = player.play(game_state)
+        assert game_state.valid_play(cards)
+        game_state.add_to_current_round(player.name, cards)
+
+        game_state.clear_current_round()
+        game_state.add_to_current_round(player.name, [9, 9, 9])
+
+        cards = player.play(game_state)
+        assert game_state.valid_play(cards)
+        game_state.add_to_current_round(player.name, cards)
+        
+        game_state.clear_current_round()
+        cards = player.play(game_state)
+        assert game_state.valid_play(cards)
+        game_state.add_to_current_round(player.name, cards)
+        
+        game_state.clear_current_round()
+        cards = player.play(game_state)
+        assert game_state.valid_play(cards)
+        game_state.add_to_current_round(player.name, cards)
+
+        game_state.clear_current_round()
+        cards = player.play(game_state)
+        assert game_state.valid_play(cards)
+        game_state.add_to_current_round(player.name, cards)
+        
+        game_state.clear_current_round()
+        cards = player.play(game_state)
+        assert game_state.valid_play(cards)
+        game_state.add_to_current_round(player.name, cards)
+        
+        game_state.clear_current_round()
+        cards = player.play(game_state)
+        assert game_state.valid_play(cards)
+        game_state.add_to_current_round(player.name, cards)
+
+        
+        player = CPU2("Test")
+        player2 = CPU2("Test2")
+        player.add_cards([10, 10, 11, 11, 11])
+        player2.add_cards([3, 4, 5, 6, 8, 9, 10, 10])
+        game_state = GameState([player, player2])
+
+        cards = player.play(game_state)
+        assert game_state.valid_play(cards)
+        game_state.add_to_current_round(player.name, cards)
+        cards2 = player2.play(game_state)
+        assert game_state.valid_play(cards2)
+
+
+        player1 = CPU2("Test1")
+        player2 = CPU2("Test2")
+        player3 = CPU2("Test3")
+        player4 = CPU2("Test4")
         player1.add_cards([3, 3, 4, 4, 7, 7, 7, 7, 9, 9, 13])
         player2.add_cards([1, 2, 2, 4, 4, 5, 5, 5, 6, 6, 8, 8, 9, 10, 10, 10, 12, 12, 12, 12])
         player3.add_cards([3, 6, 6, 6, 6, 7, 8, 8, 8, 9, 9, 9, 9, 10, 10, 11, 11, 12, 12, 13])

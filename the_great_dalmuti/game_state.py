@@ -38,6 +38,8 @@ class GameState:
         return self._current_round
 
     def add_to_current_round(self, player_name: str, cards: List[int]) -> None:
+        if not self.valid_play(cards):
+            print(f"Invalid play attempted by {player_name} with cards {cards} on {self.get_last_played()}")
         assert self.valid_play(cards)
         self._current_round.append((player_name, cards))
 
