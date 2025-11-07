@@ -1,6 +1,6 @@
 import argparse
 from the_great_dalmuti.game import Game
-from the_great_dalmuti.player import Player, CPU, Human
+from the_great_dalmuti.player import Player, CPU, CPU2, Human
 
 
 def parse_arguments():
@@ -14,7 +14,18 @@ def parse_arguments():
     parser.add_argument(
         "-p", "--players",
         nargs="+",
-        help="Player definitions in format: name:type (e.g., 'Alice:cpu' 'Sam:human'). Type can be 'cpu' or 'human'. If not provided, defaults to 'cpu'."
+        help="Player definitions in format: name:type (e.g., 'Alice:cpu' 'Sam:human'). Type can be 'cpu', 'cpu2', or 'human'. If not provided, defaults to 'cpu'."
+    )
+    parser.add_argument(
+        "-s", "--show",
+        action="store_true",
+        help="Show game state after each turn."
+    )
+    parser.add_argument(
+        "-g", "--num-games",
+        type=int,
+        default=10,
+        help="Number of games to play (default: 10)."
     )
     return parser.parse_args()
 
@@ -28,6 +39,8 @@ def create_players(args):
             
             if player_type == "human":
                 players.append(Human(name))
+            elif player_type == "cpu2":
+                players.append(CPU2(name))
             else:
                 players.append(CPU(name))
         return players
@@ -46,6 +59,14 @@ def create_players(args):
 if __name__ == "__main__":
     args = parse_arguments()
     players = create_players(args)
-    game = Game(players)
-    while True:
-        game.play()
+    game = Game(players, show_print=args.show)
+    scoreboard = {}
+    for _ in range(args.num_games):
+        ranking = game.play()
+        for player_name, rank in ranking.items():
+            if player_name not in scoreboard:
+                scoreboard[player_name] = 0
+            scoreboard[player_name] += rank
+    print("Final Scoreboard after", args.num_games, "games:")
+    for player_name, total_rank in sorted(scoreboard.items(), key=lambda x: x[1]):
+        print(f"{player_name}: {total_rank}")

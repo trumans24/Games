@@ -15,19 +15,24 @@ def get_cards(shuffle_cards=True):
 
 
 class Game:
-  def __init__(self, players: List[CPU]) -> None:
+  def __init__(self, players: List[CPU], show_print: bool = True) -> None:
     # shuffle(players)
     self.players = players
     self.cards = get_cards()
     self.game_state = GameState([p for p in players])
     self.num_players = len(players)
+    self.show_print = show_print
 
   def play(self):
+    # shuffle cards
+    self.cards = get_cards()
     # Deal cards
     for i, card in enumerate(self.cards):
       self.players[i % self.num_players].add_cards(card)
-    print(self.game_state)
     
+    if self.show_print:
+      print(self.game_state)
+
     # first player trades two cards with last players
     greater_dalmutis_cards = self.players[0].give_any_cards(2)
     greater_peons_cards = self.players[-1].give_low_cards(2)
@@ -56,15 +61,18 @@ class Game:
         if not last_player_to_play:
           last_player_to_play = player
         elif player == last_player_to_play:
-          print(f"{player.name} has won the trick but has no cards.")
+          if self.show_print:
+            print(f"{player.name} has won the trick but has no cards.")
           self.game_state.clear_current_round()
           if not self.players:
             break
           player = self.players.pop(0)
-          print(f'{player.name}\'s turn to play.')
+          if self.show_print:
+            print(f'{player.name}\'s turn to play.')
           last_player_to_play = player
         else:
-          print(f"{player.name} has no cards, skipping turn.")
+          if self.show_print:
+            print(f"{player.name} has no cards, skipping turn.")
           if not self.players:
             break
           player = self.players.pop(0)
@@ -72,30 +80,36 @@ class Game:
         break
       
       if player == last_player_to_play:
-        print(f"{player.name} has won the trick.")
-        print(self.game_state)
+        if self.show_print:
+          print(f"{player.name} has won the trick.")
+          print(self.game_state)
         self.game_state.clear_current_round()
       cards_played = player.play(self.game_state)
       if cards_played:
         last_player_to_play = player
       self.game_state.add_to_current_round(player.name, cards_played)
-      print(f'{player.name} played: {cards_played}')
+      if self.show_print:
+        print(f'{player.name} played: {cards_played}')
       
-      if not player.has_cards():
+      if not player.has_cards() and self.show_print:
         print(f"{player.name} has finished all their cards!")
-      
+
       self.players.append(player)
 
-      response = input()
-      if response in ['q', 'quit', 'exit']:
-        exit(0)
-      elif response in ['s', 'show']:
-        for p in self.players:
-          print(f"{p.name}: {p._cards}")
+      if self.show_print:
+        response = input()
+        if response in ['q', 'quit', 'exit']:
+          exit(0)
+        elif response in ['s', 'show']:
+          for p in self.players:
+            print(f"{p.name}: {p._cards}")
     
-    print("Round Over! Rankings:")
-    for i, player in enumerate(finished_players, 1):
-        print(f"{i}. {player.name}")
+    if self.show_print:
+      print("Round Over! Rankings:")
+      for i, player in enumerate(finished_players, 1):
+          print(f"{i}. {player.name}")
     self.players = finished_players
     self.game_state = GameState(self.players.copy())
+
+    return {player.name: i+1 for i, player in enumerate(finished_players)}
 
