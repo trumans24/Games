@@ -1,9 +1,0 @@
-CardDeck
-Tutorials
-YOLO
-data
-deckAPI
-skullking
-sparkle
-tests
-the_great_dalmuti
