@@ -71,6 +71,11 @@ class Player:
         pass
 
 class Human(Player):
+    def start_revolution(self):
+        if self._cards.count(13) == 2:
+            return click.confirm(f'You have all the 13s. Would you like to start a revolution?', default=True)
+        return False
+    
     def remove_cards(self, cards: List[int] | int) -> List[int]:
         if isinstance(cards, int):
             cards = [cards]

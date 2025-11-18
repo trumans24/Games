@@ -31,7 +31,7 @@ class Game:
       self.players[i % self.num_players].add_cards(card)
     
     if self.show_print:
-      print(self.game_state)
+      print(self.game_state.get_player_card_count())
 
     # first player trades two cards with last players
     greater_dalmutis_cards = self.players[0].give_any_cards(2)
@@ -82,7 +82,6 @@ class Game:
       if player == last_player_to_play:
         if self.show_print:
           print(f"{player.name} has won the trick.")
-          print(self.game_state)
         self.game_state.clear_current_round()
       cards_played = player.play(self.game_state)
       if cards_played:
