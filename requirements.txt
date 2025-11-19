@@ -11,3 +11,4 @@ nbformat
 multiset
 fastapi[standard]
 click
+pytest
