@@ -27,7 +27,7 @@ Install the package and use the `dalmuti` command to play:
 **Command Options:**
 - `-n, --num-players`: Number of players (default: 4, one of which is human)
 - `-p, --players`: Player definitions in format `name:type` (can be used multiple times)
-  - Types: `human`, `cpu`, or `cpu2`
+  - Types: `human`, `cpu`, or `cpu_easy`
   - Example: `-p "Alice:human" -p "Bob:cpu"`
 - `-q, --quiet`: Hide game state after each turn (game state is shown by default)
 - `-g, --num-games`: Number of games to play (default: 10)
@@ -40,7 +40,7 @@ dalmuti
 dalmuti -n 6
 
 # Customize players with names and types
-dalmuti -p "Alice:human" -p "Bob:cpu" -p "Charlie:cpu2" -p "Diana:cpu"
+dalmuti -p "Alice:human" -p "Bob:cpu" -p "Charlie:cpu_easy" -p "Diana:cpu"
 
 # Hide game state (game state is shown by default)
 dalmuti -q

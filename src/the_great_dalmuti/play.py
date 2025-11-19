@@ -2,7 +2,7 @@
 """CLI for The Great Dalmuti game."""
 import click
 from the_great_dalmuti.game import Game
-from the_great_dalmuti.player import Player, CPU, CPU2, Human
+from the_great_dalmuti.player import Player, CPU, CPUEasy, Human
 
 
 @click.command()
@@ -15,7 +15,7 @@ from the_great_dalmuti.player import Player, CPU, CPU2, Human
 @click.option(
     "-p", "--players",
     multiple=True,
-    help="Player definitions in format: name:type (e.g., 'Alice:cpu' 'Sam:human'). Type can be 'cpu', 'cpu2', or 'human'."
+    help="Player definitions in format: name:type (e.g., 'Alice:cpu' 'Sam:human'). Type can be 'cpu', 'cpu_easy', or 'human'."
 )
 @click.option(
     "-q", "--quiet",
@@ -39,8 +39,8 @@ def main(num_players, players, quiet, num_games):
             
             if player_type == "human":
                 player_list.append(Human(name))
-            elif player_type == "cpu2":
-                player_list.append(CPU2(name))
+            elif player_type == "cpu_easy":
+                player_list.append(CPUEasy(name))
             else:
                 player_list.append(CPU(name))
     else:

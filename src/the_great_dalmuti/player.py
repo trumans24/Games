@@ -203,7 +203,7 @@ class CPU(Player):
         return self.choose_valid(valid_cards, last_played)
 
 
-class CPU2(CPU):
+class CPUEasy(CPU):
     def play_any(self) -> List[int]:
         card_Set = set(Player.remove13(self._cards))
         # pick a random card from the set
